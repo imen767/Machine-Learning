@@ -8,7 +8,7 @@ Objectifs : segmentation, prédiction du churn, recommandations marketing.
 
 ### 1. Cloner le projet
 ```bash
-git clone <URL_du_repo>
+git clone https://github.com/imen767/Machine-Learning.git
 cd projet_ml_retail
 ```
 
