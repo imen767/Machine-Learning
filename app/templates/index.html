@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Prédiction Churn Client</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 520px;
+        }
+        h1 { text-align: center; color: #333; margin-bottom: 8px; font-size: 26px; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 13px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; color: #555; font-weight: bold; font-size: 14px; }
+        .hint { font-size: 11px; color: #999; margin-bottom: 4px; }
+        input, select {
+            width: 100%; padding: 11px;
+            border: 2px solid #ddd; border-radius: 8px;
+            font-size: 14px; transition: border-color 0.3s;
+        }
+        input:focus, select:focus { outline: none; border-color: #667eea; }
+        button {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; border-radius: 8px;
+            font-size: 16px; cursor: pointer; font-weight: bold;
+        }
+        button:hover { opacity: 0.9; }
+        .result {
+            margin-top: 25px; padding: 20px;
+            border-radius: 10px; text-align: center;
+            background: #f8f9fa; border: 2px solid #eee;
+        }
+        .result h2 { font-size: 30px; margin-bottom: 8px; }
+        .proba { font-size: 18px; color: #333; margin-bottom: 8px; }
+        .niveau { font-size: 15px; font-weight: bold; margin-bottom: 10px; }
+        .conseil {
+            font-size: 13px; color: #555;
+            background: #fff; padding: 12px;
+            border-radius: 8px; border-left: 4px solid #667eea;
+            text-align: left; margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛍️ Prédiction Churn</h1>
+        <p class="subtitle">Analyse comportementale client — E-commerce</p>
+
+        <form action="/predict" method="POST">
+
+            <div class="form-group">
+                <label>📦 Nombre de commandes</label>
+                <p class="hint">Combien de fois le client a commandé</p>
+                <input type="number" name="frequency"
+                       placeholder="Ex: 5" min="1" max="50" required>
+            </div>
+
+            <div class="form-group">
+                <label>💰 Montant moyen par commande (£)</label>
+                <p class="hint">Dépense moyenne par commande</p>
+                <input type="number" name="monetary_avg"
+                       placeholder="Ex: 200" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>📅 Jours moyens entre achats</label>
+                <p class="hint">Plus c'est grand → client inactif</p>
+                <input type="number" name="avg_days"
+                       placeholder="Ex: 30" min="0" max="365" required>
+            </div>
+
+            <div class="form-group">
+                <label>⭐ Score de satisfaction (1-5)</label>
+                <p class="hint">1 = très insatisfait, 5 = très satisfait</p>
+                <input type="number" name="satisfaction"
+                       placeholder="Ex: 4" min="1" max="5" required>
+            </div>
+
+            <div class="form-group">
+                <label>🎯 Segment RFM</label>
+                <select name="rfm_segment">
+                    <option value="0">0 - Champions</option>
+                    <option value="1">1 - Fidèles</option>
+                    <option value="2">2 - Potentiels</option>
+                    <option value="3">3 - Dormants</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>🏆 Niveau de fidélité</label>
+                <select name="loyalty">
+                    <option value="0">0 - Nouveau</option>
+                    <option value="1">1 - Jeune</option>
+                    <option value="2">2 - Établi</option>
+                    <option value="3">3 - Ancien</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>📅 Mois préféré d'achat</label>
+                <select name="pref_month">
+                    <option value="1">Janvier</option>
+                    <option value="2">Février</option>
+                    <option value="3">Mars</option>
+                    <option value="4">Avril</option>
+                    <option value="5">Mai</option>
+                    <option value="6">Juin</option>
+                    <option value="7">Juillet</option>
+                    <option value="8">Août</option>
+                    <option value="9">Septembre</option>
+                    <option value="10">Octobre</option>
+                    <option value="11">Novembre</option>
+                    <option value="12" selected>Décembre</option>
+                </select>
+            </div>
+
+            <button type="submit">🔮 Prédire le Churn</button>
+        </form>
+
+        {% if result %}
+        <div class="result">
+            <h2 style="color: {{ result.color }}">
+                {{ result.prediction }}
+            </h2>
+            <p class="proba">
+                Probabilité de churn : <strong>{{ result.probability }}</strong>
+            </p>
+            <p class="niveau" style="color: {{ result.color }}">
+                {{ result.niveau }}
+            </p>
+            <div class="conseil">
+                💡 <strong>Conseil :</strong> {{ result.conseil }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
